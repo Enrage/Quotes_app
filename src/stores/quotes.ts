@@ -9,12 +9,14 @@ export const useQuoteStore = defineStore({
   state: (): QuotesState => ({
     randomQuotes: [],
     favoriteIds: [],
-    favoriteQuotes: []
+    favoriteQuotes: [],
+    isLoading: false
   }),
 
   actions: {
     async getRandomQuotes(): Promise<void> {
       try {
+        this.isLoading = true;
         const response: AxiosResponse<Quote[]> = await axios.get(API_GET_RANDOM_QUOTES, {
           params: {
             limit: 10 as number
@@ -23,6 +25,8 @@ export const useQuoteStore = defineStore({
         this.randomQuotes = response.data;
       } catch (error: unknown) {
         console.error(error);
+      } finally {
+        this.isLoading = false;
       }
     },
 

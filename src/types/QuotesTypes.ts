@@ -38,4 +38,5 @@ export interface QuotesState {
   randomQuotes: Quote[];
   favoriteIds: string[];
   favoriteQuotes: Quote[];
+  isLoading: boolean;
 }

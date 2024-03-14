@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import QuoteItem from '@/components/QuoteItem.vue';
+import Preloader from '@/components/Preloader.vue';
 import { useQuoteStore } from '@/stores/quotes';
 import { storeToRefs } from 'pinia';
 
@@ -8,13 +9,12 @@ const quoteStore = useQuoteStore();
 
 const refreshQuotes = (): Promise<void> => quoteStore.getRandomQuotes();
 
+const { randomQuotes, isLoading } = storeToRefs(quoteStore);
 onMounted(() => {
   if (!quoteStore.randomQuotes.length) {
     quoteStore.getRandomQuotes();
   }
 });
-
-const { randomQuotes } = storeToRefs(quoteStore);
 </script>
 
 <template>
@@ -23,9 +23,10 @@ const { randomQuotes } = storeToRefs(quoteStore);
       <h1 class="quotes-title">Quotes</h1>
       <button class="quotes-refresh-btn" @click="refreshQuotes">Refresh quotes</button>
     </header>
-    <div class="quotes-list">
+    <div class="quotes-list" v-if="!isLoading">
       <QuoteItem v-for="quote in randomQuotes" :key="quote._id" :quote="quote" />
     </div>
+    <Preloader v-else />
   </main>
 </template>
 

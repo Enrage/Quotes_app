@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import QuoteItem from '@/components/QuoteItem.vue';
+import Preloader from '@/components/Preloader.vue';
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import axios, { type AxiosResponse } from 'axios';
@@ -8,9 +9,11 @@ import { API_GET_AUTHOR_BY_QUERY, API_GET_AUTHOR_BY_ID } from '@/constants/api';
 
 const quotesByAuthor = ref<Quote[]>([]);
 const authorName = ref<string>('');
+const isLoading = ref<boolean>(false);
 
 async function getAuthorIdBySlug(authorSlug: string): Promise<void> {
   try {
+    isLoading.value = true;
     const response: AxiosResponse<AuthorsResponse> = await axios.get(`${API_GET_AUTHOR_BY_QUERY}?query=${authorSlug}`);
     const author: Author = response.data.results[0];
     const authorId: string = author._id;
@@ -19,6 +22,8 @@ async function getAuthorIdBySlug(authorSlug: string): Promise<void> {
   } catch (error: unknown) {
     console.error(error);
     throw error;
+  } finally {
+    isLoading.value = false;
   }
 }
 
@@ -45,9 +50,10 @@ onMounted(() => {
     <header class="quotes-header">
       <h1 class="quotes-title">Quotes by author: {{ authorName }}</h1>
     </header>
-    <div class="quotes-list">
+    <div class="quotes-list" v-if="!isLoading">
       <QuoteItem v-for="quote in quotesByAuthor" :key="quote._id" :quote="quote" />
     </div>
+    <Preloader v-else />
   </main>
 </template>
 
